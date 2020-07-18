@@ -1,34 +1,22 @@
 require('dotenv').config();
-const request = require('request');
+const geoCode = require('./utils/geocode');
+const forecast = require('./utils/forecast');
 
-const ws = process.env.WEATHERSTACK_API;
-const mb = process.env.MAPBOX_API
+let input = process.argv;
 
-const url = `http://api.weatherstack.com/current?access_key=${ws}&query=37.8267,-122.4233&units=f`;
+if (input[2].length != 0) {
+  geoCode(input[2], (error, data) => {
+    if (error) {
+      return console.log(error);
+    };
+    forecast(data.lat, data.lon, (error, foredcastData) => {
+      if (error) {
+        return console.log(error);
+      }
+      console.log(data.loc);
+      console.log(foredcastData);
+    });
+  });
+}
 
-request({ url: url, json: true }, (error, response) => {
-  if (error) {
-    console.log('Unable to retrieve data!');
-  } else if (response.body.error) {
-    console.log('Unable to find location');
-  } else {
-    const data = response.body.current;
-    console.log('It is currently ' + data.weather_descriptions[0]);
-    console.log('The temperature is ' + data.temperature + ' and the cloud cover is ' + data.cloudcover + '%');
-    console.log('Wind speed is ' + data.wind_speed + '');
-  }
-});
 
-const geoURL = `https://api.mapbox.com/geocoding/v5/mapbox.places/Los%20Angeles.json?access_token=${mb}`;
-
-request({ url: geoURL, json: true }, (error, response) => {
-  if (error) {
-    console.log('Unable to retrieve data');
-  } else if (response.body.features.length === 0) {
-    console.log('Invalid location entry');
-  } else {
-    const lat = response.body.features[0].center[1];
-    const lon = response.body.features[0].center[0];
-    console.log(lat, lon);
-  }
-});
