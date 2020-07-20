@@ -4,19 +4,21 @@ const forecast = require('./utils/forecast');
 
 let input = process.argv;
 
-if (input[2].length != 0) {
-  geoCode(input[2], (error, data) => {
+if (input[2] != undefined) {
+  geoCode(input[2], (error, { lat, lon, loc } = {}) => {
     if (error) {
       return console.log(error);
     };
-    forecast(data.lat, data.lon, (error, foredcastData) => {
+    forecast(lat, lon, (error, foredcastData) => {
       if (error) {
         return console.log(error);
       }
-      console.log(data.loc);
+      console.log(loc);
       console.log(foredcastData);
     });
   });
+} else {
+  console.log('Please provide an address');
 }
 
 

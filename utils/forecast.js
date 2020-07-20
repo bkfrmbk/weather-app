@@ -5,14 +5,14 @@ const ws = process.env.WEATHERSTACK_API;
 
 const forecast = (lat, lon, callback) => {
   const url = `http://api.weatherstack.com/current?access_key=${ws}&query=${lat},${lon}&units=f`;
-  request({ url: url, json: true }, (error, response) => {
+  request({ url, json: true }, (error, { body }) => {
     if (error) {
       callback('Unable to retrieve data!', undefined);
-    } else if (response.body.error) {
+    } else if (body.error) {
       callback('Unable to find location', undefined);
     } else {
-      const data = response.body.current;
-      callback(undefined, 'It is currently ' + data.weather_descriptions[0] + 'The temperature is ' + data.temperature + ' and the cloud cover is ' + data.cloudcover + '%');
+      const data = body.current;
+      callback(undefined, 'It is currently ' + data.weather_descriptions[0] + '. The temperature is ' + data.temperature + ' and the cloud cover is ' + data.cloudcover + '%');
     }
   });
 }
